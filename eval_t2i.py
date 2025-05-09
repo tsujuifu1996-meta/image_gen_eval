@@ -45,7 +45,7 @@ def main(args):
     args.dump_dir = os.path.normpath(args.dump_dir)
     if args.filename == "":
         args.filename = (
-            f"{time.strftime('%Y%m%d%H%M%S', time.localtime())}_{args.metric}"
+            f"{time.strftime('%Y%m%d%H%M%S', time.localtime())}_{args.metric}.json"
         )
     if int(os.environ["LOCAL_RANK"]) == 0:
         print(f"== args: {args} ==")
@@ -66,11 +66,11 @@ def main(args):
     elif args.metric == "aesthetic":
         from metric_t2i.aesthetic import Aesthetic as Metric
     elif args.metric == "pick_score":
-        pass
+        from metric_t2i.pick_score import Pick_Score as Metric
     elif args.metric == "hps_v2":
-        pass
+        from metric_t2i.hps_v2 import HPS_v2 as Metric
     elif args.metric == "vqa_rating":
-        pass
+        from metric_t2i.vqa_rating import VQA_Rating as Metric
     else:
         raise NotImplementedError(f"== {args.metric} is not supported ==")
     metric = Metric(args.benchmark)
@@ -92,7 +92,7 @@ def main(args):
     if int(os.environ["LOCAL_RANK"]) == 0:
         json.dump(
             {"args": vars(args), "result": res, "raw_result": raw_res},
-            open(f"{args.dump_dir}/{args.filename}.json", "w"),
+            open(f"{args.dump_dir}/{args.filename}", "w"),
             indent=4,
         )
         print(f"== {args.eval_dir}: {args.metric}={res} ==")
